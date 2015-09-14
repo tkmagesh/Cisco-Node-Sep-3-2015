@@ -1,21 +1,20 @@
-var http = require('http');
+var http = require('http'),
+    fs = require('fs'),
+    path = require('path');
+
 
 var server = http.createServer(function(req, res){
-    console.log("a connection is established for ", req.url);
-    /*
-    check if req.url exists
-    if not
-        res.statusCode = 404;
-        res.end()
-    else
-        read the resource
-        and write to the res
-    endi if
-
-    */
-    res.write("<h1>Welcome to the world of node.js</h1>");
-    res.end();
+    var resourcePath = path.join(__dirname, req.url);
+    fs.exists(resourcePath, function(exists){
+        if (!exists){
+            res.statusCode = 404;
+            res.end();
+            return;
+        }
+        fs.createReadStream(resourcePath).pipe(res);
+    });
 });
 
 server.listen(9090);
 console.log("Server listening on 9090");
+

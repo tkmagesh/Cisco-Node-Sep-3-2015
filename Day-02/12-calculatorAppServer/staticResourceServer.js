@@ -16,7 +16,14 @@ module.exports = function(req, res){
                 res.end();
                 return;
             }
-            fs.createReadStream(resourcePath).pipe(res);
+            var stream = fs.createReadStream(resourcePath);
+            stream.on('data', function(chunk){
+                console.log('writing data in staticResourceServer for ' , req.url.pathname);
+                res.write(chunk);
+            });
+            stream.on('end', function(){
+                res.end();
+            });
         });
     }
 }
